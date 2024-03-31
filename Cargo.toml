@@ -1,0 +1,33 @@
+[package]
+name = "spire-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+prost = "0.12.3"
+tonic = "0.11.0"
+
+[build-dependencies]
+tonic-build = "0.11.0"
+
+[features]
+default = [
+    "agent-debug",
+    "agent-delegatedidentity",
+    "server-agent",
+    "server-bundle",
+    "server-debug",
+    "server-entry",
+    "server-localauthority",
+    "server-svid",
+    "server-trustdomain",
+]
+agent-debug = []
+agent-delegatedidentity = []
+server-agent = []
+server-bundle = []
+server-debug = []
+server-entry = []
+server-localauthority = []
+server-svid = []
+server-trustdomain = []
