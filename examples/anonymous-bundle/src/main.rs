@@ -2,17 +2,18 @@ mod rustls_dangerous_client_verifier;
 
 use base64ct::{Base64, Encoding};
 use chrono::{DateTime, Utc};
+use hyper_util::rt::TokioIo;
 use pem_rfc7468::LineEnding;
 use rustls_dangerous_client_verifier::make_unsafe_rustls_client_config;
 use spire_api::spire::api::server::bundle::v1::{bundle_client::BundleClient, GetBundleRequest};
 use tokio::net::TcpStream;
 use tokio_rustls::{rustls::pki_types::ServerName, TlsConnector};
-use tonic::transport::{Endpoint, Uri};
+use tonic::transport::{Channel, Uri};
 use tower::service_fn;
 
 async fn amain() {
     let connector = TlsConnector::from(make_unsafe_rustls_client_config());
-    let connection = Endpoint::from_static("https://localhost:8081")
+    let connection = Channel::from_static("https://localhost:8081")
         .connect_with_connector(service_fn(move |uri: Uri| {
             let connector = connector.clone();
             async move {
@@ -22,6 +23,7 @@ async fn amain() {
                         TcpStream::connect(uri.authority().unwrap().to_string()).await?,
                     )
                     .await
+                    .map(TokioIo::new)
             }
         }))
         .await
