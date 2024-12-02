@@ -39,6 +39,6 @@ fn main() {
         .include_file("spire_api.rs")
         // .bytes(None)
         .emit_rerun_if_changed(true)
-        .compile(&protos, &["proto"])
+        .compile_protos(&protos, &["proto"])
         .unwrap();
 }
