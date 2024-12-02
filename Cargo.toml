@@ -1,3 +1,7 @@
+[workspace]
+resolver = "2"
+members = ["examples/*"]
+
 [package]
 name = "spire-api"
 version = "0.0.0"

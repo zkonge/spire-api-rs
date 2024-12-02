@@ -15,8 +15,3 @@ pem-rfc7468 = { version = "0.7.0", features = ["std"] }
 base64ct = { version = "1.6.0", features = ["alloc"] }
 chrono = { version = "0.4.38", default-features = false, features = [] }
 hyper-util = { version = "0.1.10", features = ["tokio"] }
-
-[profile.release]
-opt-level = 's'
-lto = true
-strip = true
