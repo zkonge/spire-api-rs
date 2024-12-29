@@ -38,6 +38,7 @@ fn main() {
     tonic_build::configure()
         .include_file("spire_api.rs")
         // .bytes(None)
+        .build_transport(false)
         .emit_rerun_if_changed(true)
         .compile_protos(&protos, &["proto"])
         .unwrap();
