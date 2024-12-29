@@ -60,9 +60,9 @@ impl ServerCertVerifier for DangerousVerifier {
 }
 
 pub(crate) fn make_unsafe_rustls_client_config() -> Arc<ClientConfig> {
-    let config = ClientConfig::builder()
+    ClientConfig::builder()
         .dangerous()
         .with_custom_certificate_verifier(Arc::new(DangerousVerifier))
-        .with_no_client_auth();
-    Arc::new(config)
+        .with_no_client_auth()
+        .into()
 }

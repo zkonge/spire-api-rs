@@ -1,38 +1,59 @@
 mod rustls_dangerous_client_verifier;
 
-use base64ct::{Base64, Encoding};
+use std::{env::args, net::SocketAddr};
+
 use chrono::{DateTime, Utc};
+use futures_util::TryFutureExt;
 use hyper_util::rt::TokioIo;
-use pem_rfc7468::LineEnding;
-use rustls_dangerous_client_verifier::make_unsafe_rustls_client_config;
+use pem_rfc7468::{self as pem, LineEnding};
 use spire_api::spire::api::server::bundle::v1::{bundle_client::BundleClient, GetBundleRequest};
 use tokio::net::TcpStream;
 use tokio_rustls::{rustls::pki_types::ServerName, TlsConnector};
 use tonic::transport::{Channel, Uri};
 use tower::service_fn;
 
-async fn amain() {
+use crate::rustls_dangerous_client_verifier::make_unsafe_rustls_client_config;
+
+async fn new_channel(server_addr: SocketAddr) -> Channel {
     let connector = TlsConnector::from(make_unsafe_rustls_client_config());
-    let connection = Channel::from_static("https://localhost:8081")
-        .connect_with_connector(service_fn(move |uri: Uri| {
-            let connector = connector.clone();
-            async move {
-                connector
-                    .connect(
-                        ServerName::DnsName(uri.host().unwrap().to_owned().try_into().unwrap()),
-                        TcpStream::connect(uri.authority().unwrap().to_string()).await?,
-                    )
-                    .await
-                    .map(TokioIo::new)
-            }
-        }))
+    let server_name = ServerName::IpAddress(server_addr.ip().into()).to_owned();
+    let connector = service_fn(move |_: Uri| {
+        let connector = connector.clone();
+        let server_name = server_name.clone();
+
+        TcpStream::connect(server_addr)
+            .and_then(move |s| connector.connect(server_name, s))
+            .map_ok(TokioIo::new)
+    });
+
+    Channel::from_static("http://[::1]")
+        .connect_with_connector(connector)
         .await
+        .unwrap()
+}
+
+fn format_cert(der: &[u8]) -> String {
+    pem::encode_string("CERTIFICATE", LineEnding::LF, der).unwrap()
+}
+
+fn format_spki(der: &[u8]) -> String {
+    pem::encode_string("PUBLIC KEY", LineEnding::LF, der).unwrap()
+}
+
+async fn amain() {
+    // cargo run -- [::1]:8081
+    let server_addr: SocketAddr = args()
+        .skip(1)
+        .next()
+        .expect("specify a server addr first")
+        .parse()
         .unwrap();
 
-    let mut client = BundleClient::new(connection);
+    let channel = new_channel(server_addr).await;
+    let mut client = BundleClient::new(channel);
 
     let bundle = client
-        .get_bundle(GetBundleRequest { output_mask: None })
+        .get_bundle(GetBundleRequest::default())
         .await
         .unwrap()
         .into_inner();
@@ -42,12 +63,10 @@ async fn amain() {
     println!("sequence number: {}", bundle.sequence_number);
 
     // 1. X.509 authorities
-    println!("\n==== X.509 authorities ====");
+    println!("==== X.509 authorities ====");
     for cert in bundle.x509_authorities.into_iter() {
-        let cert_pem =
-            pem_rfc7468::encode_string("CERTIFICATE", LineEnding::LF, &cert.asn1).unwrap();
         println!("tainted: {}", cert.tainted);
-        println!("certificate:\n  {}", cert_pem.replace('\n', "\n  "));
+        println!("certificate:\n{}", format_cert(&cert.asn1));
     }
 
     // 2. print JWT authorities
@@ -56,13 +75,10 @@ async fn amain() {
         println!("tainted: {}", jwt.tainted);
         println!("key id: {}", jwt.key_id);
         println!(
-            "expired at: {}",
+            "expires at: {}",
             DateTime::<Utc>::from_timestamp(jwt.expires_at, 0).unwrap()
         );
-        println!(
-            "public key:\n  {}\n",
-            Base64::encode_string(&jwt.public_key)
-        );
+        println!("public key:\n{}", format_spki(&jwt.public_key));
     }
 }
 
