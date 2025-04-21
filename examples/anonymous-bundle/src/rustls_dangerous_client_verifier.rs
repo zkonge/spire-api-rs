@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use tokio_rustls::rustls::{
+    ClientConfig, Error, SignatureScheme,
     client::danger::{HandshakeSignatureValid, ServerCertVerified, ServerCertVerifier},
     pki_types::{CertificateDer, ServerName, UnixTime},
-    ClientConfig, Error, SignatureScheme,
 };
 
 #[derive(Debug)]

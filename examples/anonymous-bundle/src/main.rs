@@ -6,9 +6,9 @@ use chrono::{DateTime, Utc};
 use futures_util::TryFutureExt;
 use hyper_util::rt::TokioIo;
 use pem_rfc7468::{self as pem, LineEnding};
-use spire_api::spire::api::server::bundle::v1::{bundle_client::BundleClient, GetBundleRequest};
+use spire_api::spire::api::server::bundle::v1::{GetBundleRequest, bundle_client::BundleClient};
 use tokio::net::TcpStream;
-use tokio_rustls::{rustls::pki_types::ServerName, TlsConnector};
+use tokio_rustls::{TlsConnector, rustls::pki_types::ServerName};
 use tonic::transport::{Channel, Uri};
 use tower::service_fn;
 
