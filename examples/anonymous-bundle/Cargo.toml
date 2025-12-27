@@ -9,12 +9,12 @@ spire-api = { path = "../../", default-features = false, features = [
 ] }
 
 tokio = { version = "1.44.2", features = ["rt", "net"] }
-tonic = { version = "0.13.0", default-features = false, features = ["channel"] }
-tokio-rustls = { version = "0.26.2", default-features = false, features = [
+tonic = { version = "0.14.2", default-features = false, features = ["channel"] }
+tokio-rustls = { version = "0.26.4", default-features = false, features = [
     "ring",
 ] }
 tower = { version = "0.5.2", features = ["util"], default-features = false }
-chrono = { version = "0.4.40", default-features = false }
-hyper-util = { version = "0.1.11", features = ["tokio"] }
-pem-rfc7468 = { version = "0.7.0", features = ["alloc"] }
+chrono = { version = "0.4.42", default-features = false }
+hyper-util = { version = "0.1.19", features = ["tokio"] }
+pem-rfc7468 = { version = "1.0.0", features = ["alloc"] }
 futures-util = { version = "0.3.31", default-features = false }

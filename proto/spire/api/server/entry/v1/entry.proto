@@ -68,6 +68,17 @@ service Entry {
 }
 
 message CountEntriesRequest {
+    message Filter {
+        spire.api.types.SPIFFEID by_spiffe_id = 1;
+        spire.api.types.SPIFFEID by_parent_id = 2;
+        spire.api.types.SelectorMatch by_selectors = 3;
+        spire.api.types.FederatesWithMatch by_federates_with = 4;
+        google.protobuf.StringValue by_hint = 5;
+        google.protobuf.BoolValue by_downstream = 6;
+    }
+
+    // Filters the entries returned in the response.
+    Filter filter = 1;
 }
 
 message CountEntriesResponse {
@@ -81,6 +92,7 @@ message ListEntriesRequest {
         spire.api.types.SelectorMatch by_selectors = 3;
         spire.api.types.FederatesWithMatch by_federates_with = 4;
         google.protobuf.StringValue by_hint = 5;
+        google.protobuf.BoolValue by_downstream = 6;
     }
 
     // Filters the entries returned in the response.
@@ -231,4 +243,7 @@ message EntryRevision {
 
     // The entry revision number.
     int64 revision_number = 2;
+
+    // When the entry was created (seconds since Unix epoch).
+    int64 created_at = 3;
 }

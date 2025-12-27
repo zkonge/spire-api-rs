@@ -11,33 +11,35 @@ version = "0.0.0"
 edition.workspace = true
 
 [dependencies]
-prost = "0.13.4"
-tonic = { version = "0.13.0", default-features = false, features = [
-    "codegen",
-    "prost",
-] }
+prost = "0.14.1"
+tonic = { version = "0.14.2", default-features = false, features = ["codegen"] }
+tonic-prost = "0.14.2"
 
 [build-dependencies]
-tonic-build = "0.13.0"
+tonic-prost-build = "0.14.2"
 
 [features]
 default = [
     "agent-debug",
     "agent-delegatedidentity",
+    "agent-logger",
     "server-agent",
     "server-bundle",
     "server-debug",
     "server-entry",
     "server-localauthority",
+    "server-logger",
     "server-svid",
     "server-trustdomain",
 ]
 agent-debug = []
 agent-delegatedidentity = []
+agent-logger = []
 server-agent = []
 server-bundle = []
 server-debug = []
 server-entry = []
 server-localauthority = []
+server-logger = []
 server-svid = []
 server-trustdomain = []

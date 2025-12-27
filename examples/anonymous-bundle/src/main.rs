@@ -26,7 +26,7 @@ async fn new_channel(server_addr: SocketAddr) -> Channel {
             .map_ok(TokioIo::new)
     });
 
-    Channel::from_static("http://[::1]")
+    Channel::from_static("http://spire")
         .connect_with_connector(connector)
         .await
         .unwrap()
