@@ -1,20 +1,5 @@
 fn main() {
     let protos = [
-        // common protos
-        "proto/spire/api/types/agent.proto",
-        "proto/spire/api/types/attestation.proto",
-        "proto/spire/api/types/bundle.proto",
-        "proto/spire/api/types/entry.proto",
-        "proto/spire/api/types/federateswith.proto",
-        "proto/spire/api/types/federationrelationship.proto",
-        "proto/spire/api/types/jointoken.proto",
-        "proto/spire/api/types/jwtsvid.proto",
-        "proto/spire/api/types/logger.proto",
-        "proto/spire/api/types/selector.proto",
-        "proto/spire/api/types/spiffeid.proto",
-        "proto/spire/api/types/status.proto",
-        "proto/spire/api/types/witsvid.proto",
-        "proto/spire/api/types/x509svid.proto",
         // agent protos
         #[cfg(feature = "agent-debug")]
         "proto/spire/api/agent/debug/v1/debug.proto",
@@ -45,7 +30,6 @@ fn main() {
         .include_file("spire_api.rs")
         // .bytes(None)
         .build_transport(false)
-        .emit_rerun_if_changed(true)
         .compile_protos(&protos, &["proto"])
         .unwrap();
 }
